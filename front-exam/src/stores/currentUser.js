@@ -28,16 +28,44 @@ export const useCurrentUserStore = defineStore('currentUser', {
           throw new Error('Failed to create user')
         }
 
-        const data = await response.json()
-
         router.push('/login')
+
       } catch (error) {
         console.error('Error creating user:', error)
-        // Optionally, you can show an error message to the user
       }
     },
-    login(email, password) {
-      // ici on fait une requête POST pour se connecter
+    async login(email, password) {
+      try {
+        console.log('Attempting login...')
+        const response = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            password
+          })
+        })
+    
+        console.log('Login response:', response)
+    
+        if (!response.ok) {
+          console.error('Login failed:', response.statusText)
+          throw new Error('Failed to login')
+        }
+    
+        const data = await response.json()
+    
+        // Set current user data
+        this.setCurrentUser({ user: data.user, token: data.token })
+    
+        // Redirect the user to the dashboard or any other desired route
+        router.push('/home')
+    
+      } catch (error) {
+        console.error('Error logging in:', error)
+      }
     },
     setCurrentUser(data) {
       this.user = data.user

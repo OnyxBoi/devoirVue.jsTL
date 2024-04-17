@@ -5,8 +5,29 @@
 
 // fonction pour soumettre le formulaire
 
-  // dans la fonction appeler la fonction login du store
+// dans la fonction appeler la fonction login du store
 
+import { useCurrentUserStore } from '@/stores/currentUser'
+import { ref } from 'vue'
+
+// Retrieve the user store
+const currentUserStore = useCurrentUserStore()
+
+// Declare variables for email and password
+const email = ref('')
+const password = ref('')
+
+// Function to submit the form
+const submitForm = async () => {
+  try {
+    email.value = document.getElementById('email').value
+    password.value = document.getElementById('password').value
+
+    await currentUserStore.login(email.value, password.value)
+  } catch (error) {
+    console.error('Error submitting form:', error)
+  }
+}
 </script>
 
 <template>
@@ -20,12 +41,14 @@
         </p>
       </div>
       <div class="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
-        <form class="card-body">
+        <form class="card-body" @submit.prevent="submitForm">
           <div class="form-control">
             <label class="label">
               <span class="label-text">Email</span>
             </label>
             <input
+              name="email"
+              id="email"
               type="email"
               placeholder="email"
               class="input input-bordered"
@@ -37,6 +60,8 @@
               <span class="label-text">Password</span>
             </label>
             <input
+              name="password"
+              id="password"
               type="password"
               placeholder="password"
               class="input input-bordered"
