@@ -10,8 +10,31 @@ export const useCurrentUserStore = defineStore('currentUser', {
   getters: {},
 
   actions: {
-    inscription(username, email, password) {
-      // ici on fait une requête POST pour créer un nouvel utilisateur
+    async inscription(username, email, password) {
+      try {
+        const response = await fetch('http://localhost:3000/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            password
+          })
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to create user')
+        }
+
+        const data = await response.json()
+
+        router.push('/login')
+      } catch (error) {
+        console.error('Error creating user:', error)
+        // Optionally, you can show an error message to the user
+      }
     },
     login(email, password) {
       // ici on fait une requête POST pour se connecter

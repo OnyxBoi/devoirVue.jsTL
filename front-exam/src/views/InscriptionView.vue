@@ -1,12 +1,25 @@
 <script setup>
 
-// récupérer le store utilisateur
+import { useCurrentUserStore } from '@/stores/currentUser'
+import { ref } from 'vue'
 
-// déclarer les variables username, password et email
+const username = ref('')
+const email = ref('')
+const password = ref('')
 
-// fonction pour soumettre le formulaire
+const currentUserStore = useCurrentUserStore()
 
-  // dans la fonction appeler la fonction createUser du store
+const submitForm = async () => {
+  try {
+    username.value = document.getElementById('username').value;
+    email.value = document.getElementById('email').value;
+    password.value = document.getElementById('password').value;
+    await currentUserStore.inscription(username.value, email.value, password.value)
+  } catch (error) {
+    console.error('Error submitting form:', error)
+  }
+}
+
 
 </script>
 
@@ -26,6 +39,8 @@
             <input
               type="username"
               placeholder="username"
+              name="username"
+              id="username"
               class="input input-bordered"
               required
             />
@@ -37,6 +52,8 @@
             <input
               type="email"
               placeholder="email"
+              name="email"
+              id="email"
               class="input input-bordered"
               required
             />
@@ -48,12 +65,14 @@
             <input
               type="password"
               placeholder="password"
+              name="password"
+              id="password"
               class="input input-bordered"
               required
             />
           </div>
           <div class="form-control mt-6">
-            <button class="btn btn-primary">Login</button>
+            <button class="btn btn-primary" @click="submitForm">Login</button>
           </div>
         </form>
       </div>
