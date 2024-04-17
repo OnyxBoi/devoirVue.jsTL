@@ -11,16 +11,62 @@ export const useNotesStore = defineStore('notes', {
 
   actions: {
     getAllNotes() {
-      const store = useCurrentUserStore()
-      const { token, user } = storeToRefs(store)
+      const { token, user } = storeToRefs(useCurrentUserStore())
 
-      // ici on fait une requête GET pour récupérer toutes les notes de l'utilisateur
+      return fetch(`http://localhost:3000/users/${user.value.id}/notes`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token.value}`
+        }
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch notes')
+          }
+          return response.json()
+        })
+        .then(notes => {
+          this.notes = notes
+        })
+        .catch(error => {
+          console.error('Error fetching notes:', error)
+        })
     },
     createNote(note) {
       const store = useCurrentUserStore()
       const { token, user } = storeToRefs(store)
 
-      // ici on fait une requête POST pour créer une nouvelle note
+      // Make sure user and token are available
+      if (!user.value.id || !token.value) {
+        throw new Error('User ID or token is missing')
+      }
+
+      fetch(`http://localhost:3000/users/notes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token.value
+        },
+        body: JSON.stringify({
+          userId: user.value.id,
+          title: note.title,
+          content: note.content
+        })
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to create note')
+          }
+          return response.json()
+        })
+        .then(data => {
+          console.log('Note created successfully:', data)
+          // Optionally, update local state with the newly created note
+          this.notes.push(data)
+        })
+        .catch(error => {
+          console.error('Error creating note:', error)
+        })
     },
     updateNote(note) {
       const store = useCurrentUserStore()

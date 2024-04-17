@@ -1,7 +1,5 @@
 <script setup>
-// récupérer le store des notes
-
-// recuperer les notes
+import NoteForm from '@/components/NoteForm.vue';
 </script>
 
 <template>

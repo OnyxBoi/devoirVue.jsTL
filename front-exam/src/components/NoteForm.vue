@@ -1,11 +1,30 @@
 <script setup>
-// récupérer le store des notes
+import { useNotesStore } from '@/stores/notes'
+  import { ref } from 'vue'
 
-// declarer les variables title et content
+  // Retrieve the notes store
+  const notesStore = useNotesStore()
 
-// fonction pour ajouter une note
+  // Declare variables for title and content
+  const title = ref('')
+  const content = ref('')
 
-  // dans la fonction appeler la fonction createNote du store
+  // Function to add a note
+  const addNote = () => {
+    try {
+      title.value = document.getElementById("title").value
+      content.value = document.getElementById("content").value
+      notesStore.createNote({
+        title: title.value,
+        content: content.value
+      })
+      // Clear the input fields after adding the note
+      title.value = ''
+      content.value = ''
+    } catch (error) {
+      console.error('Error adding note:', error)
+    }
+  }
 
 </script>
 
