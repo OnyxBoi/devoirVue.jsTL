@@ -1,5 +1,15 @@
 <script setup>
+import { useNotesStore } from '@/stores/notes'
 import NoteForm from '@/components/NoteForm.vue';
+
+// Retrieve the notes store
+const notesStore = useNotesStore()
+
+// Retrieve the notes
+const notes = notesStore.notes
+
+// Call the action to fetch all notes
+notesStore.getAllNotes()
 </script>
 
 <template>
@@ -13,39 +23,32 @@ import NoteForm from '@/components/NoteForm.vue';
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Titre
                   </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Contenu
                   </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
-                <tr>
+                <!-- Iterate over each note and render -->
+                <tr v-for="note in notes" :key="note.id">
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900"></div>
+                    <div class="text-sm text-gray-900">{{ note.title }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900"></div>
+                    <div class="text-sm text-gray-900">{{ note.content }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button  class="text-indigo-600 hover:text-indigo-900">Edit</button>
-                    <button  class="text-red-600 hover:text-red-900 ml-4">Delete</button>
+                    <button class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                    <button class="text-red-600 hover:text-red-900 ml-4">Delete</button>
                   </td>
                 </tr>
+                <!-- End of iteration -->
               </tbody>
             </table>
           </div>
