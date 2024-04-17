@@ -1,15 +1,35 @@
 <script setup>
 import { useNotesStore } from '@/stores/notes'
 import NoteForm from '@/components/NoteForm.vue';
+import { storeToRefs } from 'pinia';
 
-// Retrieve the notes store
 const notesStore = useNotesStore()
 
-// Retrieve the notes
-const notes = notesStore.notes
+const { notes } = storeToRefs(notesStore)
 
-// Call the action to fetch all notes
-notesStore.getAllNotes()
+const deleteNote = (note) => {
+  notesStore.deleteNote(note)
+}
+
+
+const toggleEditMode = (note) => {
+  note.editMode = !note.editMode
+  note.updatedTitle = note.title
+  note.updatedContent = note.content
+}
+
+const updateNote = (note) => {
+  console.log(note)
+  const updatedNote = {
+    id: note.id,
+    title: note.updatedTitle,
+    content: note.updatedContent
+  }
+  notesStore.updateNote(updatedNote)
+  note.editMode = false
+}
+
+toggleEditMode(notes)
 </script>
 
 <template>
@@ -35,20 +55,21 @@ notesStore.getAllNotes()
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
-                <!-- Iterate over each note and render -->
                 <tr v-for="note in notes" :key="note.id">
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">{{ note.title }}</div>
+                    <div v-if="!note.editMode" class="text-sm text-gray-900">{{ note.title }}</div>
+                    <input v-else v-model="note.updatedTitle" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">{{ note.content }}</div>
+                    <div v-if="!note.editMode" class="text-sm text-gray-900">{{ note.content }}</div>
+                    <textarea v-else v-model="note.updatedContent" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button class="text-indigo-600 hover:text-indigo-900">Edit</button>
-                    <button class="text-red-600 hover:text-red-900 ml-4">Delete</button>
+                    <button @click="toggleEditMode(note)" v-if="!note.editMode" class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                    <button @click="updateNote(note)" v-else class="text-green-600 hover:text-green-900">Submit</button>
+                    <button @click="() => deleteNote(note)" class="text-red-600 hover:text-red-900 ml-4">Delete</button>
                   </td>
                 </tr>
-                <!-- End of iteration -->
               </tbody>
             </table>
           </div>

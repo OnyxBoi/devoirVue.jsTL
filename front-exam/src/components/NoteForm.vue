@@ -2,14 +2,11 @@
 import { useNotesStore } from '@/stores/notes'
   import { ref } from 'vue'
 
-  // Retrieve the notes store
   const notesStore = useNotesStore()
 
-  // Declare variables for title and content
   const title = ref('')
   const content = ref('')
 
-  // Function to add a note
   const addNote = () => {
     try {
       title.value = document.getElementById("title").value
@@ -18,9 +15,9 @@ import { useNotesStore } from '@/stores/notes'
         title: title.value,
         content: content.value
       })
-      // Clear the input fields after adding the note
       title.value = ''
       content.value = ''
+      
     } catch (error) {
       console.error('Error adding note:', error)
     }

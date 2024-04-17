@@ -36,7 +36,6 @@ export const useNotesStore = defineStore('notes', {
       const store = useCurrentUserStore()
       const { token, user } = storeToRefs(store)
 
-      // Make sure user and token are available
       if (!user.value.id || !token.value) {
         throw new Error('User ID or token is missing')
       }
@@ -57,11 +56,11 @@ export const useNotesStore = defineStore('notes', {
           if (!response.ok) {
             throw new Error('Failed to create note')
           }
+          this.getAllNotes()
           return response.json()
         })
         .then(data => {
           console.log('Note created successfully:', data)
-          // Optionally, update local state with the newly created note
           this.notes.push(data)
         })
         .catch(error => {
@@ -69,17 +68,62 @@ export const useNotesStore = defineStore('notes', {
         })
     },
     updateNote(note) {
-      const store = useCurrentUserStore()
-      const { token } = storeToRefs(store)
+      console.log(note.title, note.content)
+      const { token, user } = storeToRefs(useCurrentUserStore())
 
-      // ici on fait une requête PATCH pour mettre à jour une note
+      return fetch(`http://localhost:3000/users/${user.value.id}/notes/${note.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token.value
+        },
+        body: JSON.stringify({
+          title: note.title,
+          content: note.content
+        })
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to update note')
+          }
+          return response.json()
+        })
+        .then(updatedNote => {
+          const index = this.notes.findIndex(n => n.id === note.id)
+          if (index !== -1) {
+            this.notes[index] = updatedNote
+          }
+          return updatedNote
+        })
+        .catch(error => {
+          console.error('Error updating note:', error)
+        })
     },
     deleteNote(note) {
-      const store = useCurrentUserStore()
-      const { token } = storeToRefs(store)
-
-      // ici on fait une requête DELETE pour supprimer une note
+      const { token , user } = storeToRefs(useCurrentUserStore())
+    
+      if (!token.value) {
+        throw new Error('Token is missing')
+      }
+    
+      fetch(`http://localhost:3000/users/${user.value.id}/notes/${note.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token.value}`
+        }
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to delete note')
+          }
+          console.log('Note deleted successfully')
+          this.notes = this.notes.filter(n => n.id !== note.id)
+        })
+        .catch(error => {
+          console.error('Error deleting note:', error)
+        })
     }
+    
   },
 
   persist: true
