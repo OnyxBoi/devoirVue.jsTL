@@ -79,9 +79,7 @@ export const useCurrentUserStore = defineStore('currentUser', {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + this.token
         },
-        body: JSON.stringify({
-          // ici on envoie les données à mettre à jour
-        })
+        body: data
       })
         .then((res) => res.json())
         .then((data) => {
